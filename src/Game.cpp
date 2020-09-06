@@ -17,8 +17,8 @@ bool Game::isRunning() const {
 // velocity is measured in pixels per frame per second
 float projectilePosX = 0.0f;
 float projectilePosY = 0.0f;
-float projectileVelX = 0.05f;
-float projectileVelY = 0.05f;
+float projectileVelX = 10.0f;
+float projectileVelY = 10.0;
 
 void Game::initialize(int width, int height){
     if( SDL_Init(SDL_INIT_EVERYTHING) != 0){
@@ -55,20 +55,44 @@ void Game::processInput(){
         case SDL_QUIT:
             running = false;
             break;
-        case SDL_KEYDOWN: 
+        case SDL_KEYDOWN:
             if(event.key.keysym.sym == SDLK_ESCAPE){
                 running = false;
             }
             break;
         default:
-            break;       
-    }   
+            break;
+    }
     return;
 }
 
+/*
+ * Timestep - how a computer view the render cycle
+ * - This funtion says 'while the game is running, update'
+ *   - How fast it loops depends on the machine's clock cycle
+ * `projectile.position.x +=3` says every clock cycle, increment pos by 3
+ *   - this is not consistent over multiple computers
+ * delta time - (final - initial) how many ms from this frame to last frame?
+ *   - SDL_GetTicks() since init, it counts how many tics elapsed in ms
+ *   - deltaTime is the difference in ticks from last frame converted to seconds
+ * What happens when we rener faster that the frame rate??
+ *   - we need to delay the update until the time elapsed between frames is up!
+ */
 void Game::update(){
-    projectilePosX += projectileVelX;
-    projectilePosY += projectileVelY;
+    // Wait untill 16ms ellapsed since last frame
+    //SDL_Delay(16);
+    while(!SDL_TICKS_PASSED(SDL_GetTicks(), ticksLastFrame + FRAME_TARGET_TIME));
+    float deltaTime = ( SDL_GetTicks() - ticksLastFrame ) / 1000.0f;
+
+    // Clamp delta time to max value
+    deltaTime = (deltaTime > 20.0f) ? 0.05f : deltaTime;
+
+    // Sets the new ticks for curr frame for the next pass
+    ticksLastFrame = SDL_GetTicks();
+
+    // the ` * deltaTime` smooths out the frame rate
+    projectilePosX += projectileVelX * deltaTime;
+    projectilePosY += projectileVelY * deltaTime;
 }
 
 void Game::render(){

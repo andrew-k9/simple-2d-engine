@@ -10,6 +10,7 @@ class Game{
         Game();
         ~Game();
         bool isRunning() const;
+        int ticksLastFrame;
         void initialize(int width, int height);
         void processInput();
         void update();
