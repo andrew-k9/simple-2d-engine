@@ -80,8 +80,12 @@ void Game::processInput(){
  */
 void Game::update(){
     // Wait untill 16ms ellapsed since last frame
-    //SDL_Delay(16);
-    while(!SDL_TICKS_PASSED(SDL_GetTicks(), ticksLastFrame + FRAME_TARGET_TIME));
+    // SDL_Delay(16);
+    // while(!SDL_TICKS_PASSED(SDL_GetTicks(), ticksLastFrame + FRAME_TARGET_TIME));
+    int timeToWait = FRAME_TARGET_TIME - ( SDL_GetTicks() - ticksLastFrame );
+    if( timeToWait > 0 && timeToWait <= FRAME_TARGET_TIME ){
+        SDL_Delay(timeToWait);
+    }
     float deltaTime = ( SDL_GetTicks() - ticksLastFrame ) / 1000.0f;
 
     // Clamp delta time to max value
